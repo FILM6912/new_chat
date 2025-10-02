@@ -1,14 +1,15 @@
 import { useState, useEffect, useRef } from 'react';
-import { motion } from 'framer-motion';
-import { Send, Paperclip } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Send, Paperclip, X, Image as ImageIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import VoiceInput from './VoiceInput';
 import { useTheme } from '@/contexts/ThemeContext';
+import { MessageImage } from '@/types/chat';
 
 
 interface ChatInputProps {
-  onSendMessage: (message: string) => void;
+  onSendMessage: (message: string, images?: MessageImage[]) => void;
   isLoading: boolean;
   autoSend: boolean;
   onSendFile?: (file: File) => void;
@@ -17,18 +18,57 @@ interface ChatInputProps {
 
 export const ChatInput = ({ onSendMessage, isLoading, autoSend, onSendFile }: ChatInputProps) => {
   const [message, setMessage] = useState('');
+  const [selectedImages, setSelectedImages] = useState<MessageImage[]>([]);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { theme } = useTheme();
   // Handle file selection
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file && onSendFile) {
-      onSendFile(file);
-    }
+    const files = Array.from(e.target.files || []);
+    console.log('Selected files:', files);
+    const imageFiles = files.filter(file => file.type.startsWith('image/'));
+    console.log('Image files:', imageFiles);
+    
+    imageFiles.forEach(file => {
+      // Create object URL for preview
+      const url = URL.createObjectURL(file);
+      console.log('Created URL for', file.name, ':', url);
+      const imageData: MessageImage = {
+        url,
+        file,
+        name: file.name,
+        size: file.size
+      };
+      
+      setSelectedImages(prev => [...prev, imageData]);
+    });
+    
     // Reset input value so same file can be selected again
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
+
+  // Remove selected image
+  const removeImage = (index: number) => {
+    setSelectedImages(prev => {
+      const imageToRemove = prev[index];
+      // Revoke object URL to free memory
+      if (imageToRemove.url.startsWith('blob:')) {
+        URL.revokeObjectURL(imageToRemove.url);
+      }
+      return prev.filter((_, i) => i !== index);
+    });
+  };
+
+  // Clean up object URLs when component unmounts or images change
+  useEffect(() => {
+    return () => {
+      selectedImages.forEach(image => {
+        if (image.url.startsWith('blob:')) {
+          URL.revokeObjectURL(image.url);
+        }
+      });
+    };
+  }, [selectedImages]);
 
   // Reset textarea height when message is cleared
   useEffect(() => {
@@ -58,9 +98,13 @@ export const ChatInput = ({ onSendMessage, isLoading, autoSend, onSendFile }: Ch
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (message.trim() && !isLoading) {
-      onSendMessage(message.trim());
+    if ((message.trim() || selectedImages.length > 0) && !isLoading) {
+      // Create a copy of selected images to avoid immediate cleanup
+      const imagesToSend = selectedImages.map(img => ({ ...img }));
+      onSendMessage(message.trim(), imagesToSend.length > 0 ? imagesToSend : undefined);
       setMessage('');
+      // Note: Don't clean up URLs immediately - let them persist for message display
+      setSelectedImages([]);
     }
   };
 
@@ -84,8 +128,12 @@ export const ChatInput = ({ onSendMessage, isLoading, autoSend, onSendFile }: Ch
     }, 0);
     
     if (autoSend && text.trim()) {
-      onSendMessage(text.trim());
+      // Create a copy of selected images to avoid immediate cleanup
+      const imagesToSend = selectedImages.map(img => ({ ...img }));
+      onSendMessage(text.trim(), imagesToSend.length > 0 ? imagesToSend : undefined);
       setMessage('');
+      // Note: Don't clean up URLs immediately - let them persist for message display
+      setSelectedImages([]);
     }
   };
 
@@ -96,6 +144,70 @@ export const ChatInput = ({ onSendMessage, isLoading, autoSend, onSendFile }: Ch
       transition={{ duration: 0.5 }}
   className="pb-6 opacity-50 bg-transparent"
     >
+      {/* Image Preview Section */}
+      <AnimatePresence>
+        {selectedImages.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 20, height: 0 }}
+            animate={{ opacity: 1, y: 0, height: 'auto' }}
+            exit={{ opacity: 0, y: -20, height: 0 }}
+            transition={{ duration: 0.3 }}
+            className="max-w-4xl mx-auto mb-4"
+          >
+            <div className={`backdrop-blur-xl rounded-2xl p-4 border shadow-xl ${
+              theme === 'dark'
+                ? 'bg-gray-800/60 border-gray-600/50'
+                : 'bg-white/80 border-gray-300/50'
+            }`}>
+              <div className="flex items-center space-x-2 mb-3">
+                <ImageIcon className="w-4 h-4 text-blue-500" />
+                <span className={`text-sm font-medium ${
+                  theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                }`}>
+                  รูปภาพที่เลือก ({selectedImages.length})
+                </span>
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                {selectedImages.map((image, index) => (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: index * 0.1 }}
+                    className="relative group"
+                  >
+                    <img
+                      src={image.url}
+                      alt={image.name}
+                      className={`w-full h-20 object-cover rounded-lg border ${
+                        theme === 'dark' 
+                          ? 'border-gray-600/50' 
+                          : 'border-gray-300/50'
+                      }`}
+                    />
+                    <motion.button
+                      whileTap={{ scale: 0.8 }}
+                      onClick={() => removeImage(index)}
+                      className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center shadow-lg border-2 border-white transition-colors"
+                      title="ลบรูปภาพ"
+                    >
+                      <X className="w-3 h-3" />
+                    </motion.button>
+                    <div className={`absolute bottom-1 left-1 right-1 text-xs rounded px-1 py-0.5 truncate ${
+                      theme === 'dark'
+                        ? 'bg-black/60 text-white'
+                        : 'bg-white/80 text-gray-800'
+                    }`}>
+                      {image.name}
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
   <form onSubmit={handleSubmit} className="flex items-end justify-center space-x-4 max-w-4xl mx-auto">
         {/* Attachment Button */}
 
@@ -123,6 +235,8 @@ export const ChatInput = ({ onSendMessage, isLoading, autoSend, onSendFile }: Ch
             ref={fileInputRef}
             style={{ display: 'none' }}
             onChange={handleFileChange}
+            accept="image/*"
+            multiple
             tabIndex={-1}
           />
         </motion.div>
@@ -196,7 +310,7 @@ export const ChatInput = ({ onSendMessage, isLoading, autoSend, onSendFile }: Ch
         >
           <Button
             type="submit"
-            disabled={!message.trim() || isLoading}
+            disabled={(!message.trim() && selectedImages.length === 0) || isLoading}
             className="rounded-full bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 hover:from-purple-600 hover:via-pink-600 hover:to-blue-600 text-white px-8 py-4 shadow-2xl shadow-purple-500/30 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 relative overflow-hidden"
           >
             {/* Animated background */}

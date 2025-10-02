@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { Message } from '@/types/chat';
-import { Bot, User, Copy, Check } from 'lucide-react';
+import { Bot, User, Copy, Check, Image as ImageIcon } from 'lucide-react';
 import MarkdownRenderer from './MarkdownRenderer';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useState } from 'react';
@@ -20,6 +20,7 @@ const MessageBubble = ({ message, index }: MessageBubbleProps) => {
     setCopied(true);
     setTimeout(() => setCopied(false), 1200);
   };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 30, scale: 0.8 }}
@@ -71,7 +72,6 @@ const MessageBubble = ({ message, index }: MessageBubbleProps) => {
         } backdrop-blur-sm`} />
         
         {/* Animated border glow */}
-        {/* Static blue glow for user bubble */}
         <div
           className={`absolute inset-0 rounded-3xl ${
             theme === 'dark'
@@ -86,14 +86,102 @@ const MessageBubble = ({ message, index }: MessageBubbleProps) => {
           transition={{ delay: 0.2 }}
           className="relative z-10"
         >
-          <MarkdownRenderer 
-            content={message.content}
-            className={`text-sm leading-relaxed break-words whitespace-pre-wrap max-w-full ${
+          {/* Image Display */}
+          {message.images && message.images.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.1 }}
+              className="mb-3"
+            >
+              <div className="grid grid-cols-1 gap-2 max-w-sm">
+                {message.images.map((image, index) => (
+                  <motion.div
+                    key={index}
+                    whileHover={{ scale: 1.02 }}
+                    className="relative group cursor-pointer"
+                  >
+                    <img
+                      src={image.url}
+                      alt={image.name || `Image ${index + 1}`}
+                      className={`rounded-lg shadow-lg max-w-full h-auto object-cover transition-all duration-300 ${
+                        theme === 'dark'
+                          ? 'border border-gray-600/50'
+                          : 'border border-gray-300/50'
+                      }`}
+                      style={{ maxHeight: '300px', maxWidth: '100%' }}
+                      onError={(e) => {
+                        console.error('Image failed to load:', image.url, e);
+                      }}
+                      onLoad={() => {
+                        console.log('Image loaded successfully:', image.url);
+                      }}
+                      onClick={() => {
+                        // Create a modal or open in new tab
+                        const newWindow = window.open();
+                        if (newWindow) {
+                          newWindow.document.write(`
+                            <html>
+                              <head><title>Image Preview</title></head>
+                              <body style="margin:0;padding:20px;background:#000;display:flex;justify-content:center;align-items:center;min-height:100vh;">
+                                <img src="${image.url}" style="max-width:100%;max-height:100%;object-fit:contain;" />
+                              </body>
+                            </html>
+                          `);
+                        }
+                      }}
+                    />
+                    {/* Image overlay with info */}
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      whileHover={{ opacity: 1 }}
+                      className={`absolute inset-0 rounded-lg flex items-end transition-opacity ${
+                        theme === 'dark'
+                          ? 'bg-black/50'
+                          : 'bg-black/30'
+                      }`}
+                    >
+                      <div className="p-2 text-white text-xs">
+                        <div className="flex items-center space-x-1">
+                          <ImageIcon className="w-3 h-3" />
+                          <span>{image.name || `Image ${index + 1}`}</span>
+                        </div>
+                        {image.size && (
+                          <div className="text-gray-300 text-xs">
+                            {(image.size / 1024 / 1024).toFixed(1)} MB
+                          </div>
+                        )}
+                      </div>
+                    </motion.div>
+                  </motion.div>
+                ))}
+              </div>
+            </motion.div>
+          )}
+
+          {/* Text Content */}
+          {message.content && message.content.trim() !== '' && (
+            <MarkdownRenderer 
+              content={message.content}
+              className={`text-sm leading-relaxed break-words whitespace-pre-wrap max-w-full ${
+                theme === 'dark'
+                  ? 'text-gray-100'
+                  : 'text-gray-800'
+              }`}
+            />
+          )}
+          
+          {/* No content message for image-only messages */}
+          {(!message.content || message.content.trim() === '') && message.images && message.images.length > 0 && (
+            <div className={`text-sm italic ${
               theme === 'dark'
-                ? 'text-gray-100'
-                : 'text-gray-800'
-            }`}
-          />
+                ? 'text-gray-400'
+                : 'text-gray-500'
+            }`}>
+              ส่งรูปภาพ
+            </div>
+          )}
+
           <div className="flex items-center justify-between gap-2 mt-3">
             <motion.p 
               initial={{ opacity: 0 }}
@@ -122,8 +210,6 @@ const MessageBubble = ({ message, index }: MessageBubbleProps) => {
             </motion.button>
           </div>
         </motion.div>
-        
-        {/* timestamp and copy icon moved above */}
       </motion.div>
     </motion.div>
   );
