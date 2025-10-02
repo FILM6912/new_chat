@@ -1,0 +1,1046 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+
+    --primary: 222.2 47.4% 11.2%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 222.2 84% 4.9%;
+
+    --radius: 0.5rem;
+
+    --sidebar-background: 0 0% 98%;
+
+    --sidebar-foreground: 240 5.3% 26.1%;
+
+    --sidebar-primary: 240 5.9% 10%;
+
+    --sidebar-primary-foreground: 0 0% 98%;
+
+    --sidebar-accent: 240 4.8% 95.9%;
+
+    --sidebar-accent-foreground: 240 5.9% 10%;
+
+    --sidebar-border: 220 13% 91%;
+
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* Custom Scrollbar Styles */
+@layer utilities {
+  /* Modern Custom Scrollbar with Animations */
+  .custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(156, 163, 175, 0.3) transparent;
+    transition: scrollbar-color 0.5s ease;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 12px;
+    margin: 2px;
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, 
+      rgba(168, 85, 247, 0.4) 0%, 
+      rgba(236, 72, 153, 0.4) 50%, 
+      rgba(59, 130, 246, 0.4) 100%);
+    border-radius: 12px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+    box-shadow: 0 0 10px rgba(168, 85, 247, 0.2);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    animation: scrollbar-glow 3s ease-in-out infinite;
+  }
+
+  @keyframes scrollbar-glow {
+    0%, 100% {
+      box-shadow: 0 0 10px rgba(168, 85, 247, 0.2);
+    }
+    50% {
+      box-shadow: 0 0 15px rgba(168, 85, 247, 0.4);
+    }
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, 
+      rgba(168, 85, 247, 0.7) 0%, 
+      rgba(236, 72, 153, 0.7) 50%, 
+      rgba(59, 130, 246, 0.7) 100%);
+    transform: scale(1.1);
+    box-shadow: 0 0 20px rgba(168, 85, 247, 0.5);
+    animation: scrollbar-pulse 1s ease-in-out infinite;
+  }
+
+  @keyframes scrollbar-pulse {
+    0%, 100% {
+      transform: scale(1.1);
+    }
+    50% {
+      transform: scale(1.15);
+    }
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb:active {
+    background: linear-gradient(135deg, 
+      rgba(168, 85, 247, 0.9) 0%, 
+      rgba(236, 72, 153, 0.9) 50%, 
+      rgba(59, 130, 246, 0.9) 100%);
+    box-shadow: 0 0 25px rgba(168, 85, 247, 0.7);
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+
+  /* Dark theme scrollbar with animation */
+  .dark .custom-scrollbar {
+    scrollbar-color: rgba(139, 92, 246, 0.5) rgba(255, 255, 255, 0.05);
+    transition: scrollbar-color 0.5s ease;
+  }
+
+  .dark .custom-scrollbar::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  .dark .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, 
+      rgba(139, 92, 246, 0.5) 0%, 
+      rgba(219, 39, 119, 0.5) 50%, 
+      rgba(79, 70, 229, 0.5) 100%);
+    box-shadow: 0 0 15px rgba(139, 92, 246, 0.3);
+    animation: dark-scrollbar-glow 3s ease-in-out infinite;
+  }
+
+  @keyframes dark-scrollbar-glow {
+    0%, 100% {
+      box-shadow: 0 0 15px rgba(139, 92, 246, 0.3);
+    }
+    50% {
+      box-shadow: 0 0 20px rgba(139, 92, 246, 0.5);
+    }
+  }
+
+  .dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, 
+      rgba(139, 92, 246, 0.8) 0%, 
+      rgba(219, 39, 119, 0.8) 50%, 
+      rgba(79, 70, 229, 0.8) 100%);
+    box-shadow: 0 0 25px rgba(139, 92, 246, 0.6);
+  }
+
+  .dark .custom-scrollbar::-webkit-scrollbar-thumb:active {
+    background: linear-gradient(135deg, 
+      rgba(139, 92, 246, 1) 0%, 
+      rgba(219, 39, 119, 1) 50%, 
+      rgba(79, 70, 229, 1) 100%);
+    box-shadow: 0 0 30px rgba(139, 92, 246, 0.8);
+  }
+
+  /* Ultra-thin scrollbar for chat messages with animations */
+  .ultra-thin-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(156, 163, 175, 0.2) transparent;
+    transition: scrollbar-color 0.5s ease;
+  }
+
+  .ultra-thin-scrollbar::-webkit-scrollbar {
+    width: 6px;
+    transition: width 0.3s ease;
+  }
+
+  .ultra-thin-scrollbar::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.02);
+    border-radius: 10px;
+    margin: 4px;
+    transition: all 0.5s ease;
+  }
+
+  .ultra-thin-scrollbar::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, 
+      rgba(168, 85, 247, 0.3) 0%, 
+      rgba(59, 130, 246, 0.3) 50%,
+      rgba(34, 197, 94, 0.3) 100%);
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 8px rgba(168, 85, 247, 0.2);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    animation: rainbow-flow 4s ease-in-out infinite;
+  }
+
+  @keyframes rainbow-flow {
+    0% {
+      background: linear-gradient(180deg, 
+        rgba(168, 85, 247, 0.3) 0%, 
+        rgba(59, 130, 246, 0.3) 50%,
+        rgba(34, 197, 94, 0.3) 100%);
+    }
+    33% {
+      background: linear-gradient(180deg, 
+        rgba(59, 130, 246, 0.3) 0%, 
+        rgba(34, 197, 94, 0.3) 50%,
+        rgba(236, 72, 153, 0.3) 100%);
+    }
+    66% {
+      background: linear-gradient(180deg, 
+        rgba(34, 197, 94, 0.3) 0%, 
+        rgba(236, 72, 153, 0.3) 50%,
+        rgba(168, 85, 247, 0.3) 100%);
+    }
+    100% {
+      background: linear-gradient(180deg, 
+        rgba(168, 85, 247, 0.3) 0%, 
+        rgba(59, 130, 246, 0.3) 50%,
+        rgba(34, 197, 94, 0.3) 100%);
+    }
+  }
+
+  .ultra-thin-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, 
+      rgba(168, 85, 247, 0.6) 0%, 
+      rgba(59, 130, 246, 0.6) 50%,
+      rgba(34, 197, 94, 0.6) 100%);
+    border-color: rgba(255, 255, 255, 0.3);
+    box-shadow: 0 0 15px rgba(168, 85, 247, 0.4);
+    transform: scaleY(1.1);
+    animation: none;
+  }
+
+  .ultra-thin-scrollbar::-webkit-scrollbar-thumb:active {
+    background: linear-gradient(180deg, 
+      rgba(168, 85, 247, 0.8) 0%, 
+      rgba(59, 130, 246, 0.8) 50%,
+      rgba(34, 197, 94, 0.8) 100%);
+    box-shadow: 0 0 20px rgba(168, 85, 247, 0.6);
+  }
+
+  /* Dark theme ultra-thin scrollbar with rainbow animation */
+  .dark .ultra-thin-scrollbar {
+    scrollbar-color: rgba(139, 92, 246, 0.4) rgba(255, 255, 255, 0.02);
+    transition: scrollbar-color 0.5s ease;
+  }
+
+  .dark .ultra-thin-scrollbar::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.02);
+  }
+
+  .dark .ultra-thin-scrollbar::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, 
+      rgba(139, 92, 246, 0.4) 0%, 
+      rgba(79, 70, 229, 0.4) 50%,
+      rgba(59, 130, 246, 0.4) 100%);
+    border-color: rgba(0, 0, 0, 0.2);
+    box-shadow: 0 0 12px rgba(139, 92, 246, 0.3);
+    animation: dark-rainbow-flow 4s ease-in-out infinite;
+  }
+
+  @keyframes dark-rainbow-flow {
+    0% {
+      background: linear-gradient(180deg, 
+        rgba(139, 92, 246, 0.4) 0%, 
+        rgba(79, 70, 229, 0.4) 50%,
+        rgba(59, 130, 246, 0.4) 100%);
+    }
+    33% {
+      background: linear-gradient(180deg, 
+        rgba(79, 70, 229, 0.4) 0%, 
+        rgba(59, 130, 246, 0.4) 50%,
+        rgba(219, 39, 119, 0.4) 100%);
+    }
+    66% {
+      background: linear-gradient(180deg, 
+        rgba(59, 130, 246, 0.4) 0%, 
+        rgba(219, 39, 119, 0.4) 50%,
+        rgba(139, 92, 246, 0.4) 100%);
+    }
+    100% {
+      background: linear-gradient(180deg, 
+        rgba(139, 92, 246, 0.4) 0%, 
+        rgba(79, 70, 229, 0.4) 50%,
+        rgba(59, 130, 246, 0.4) 100%);
+    }
+  }
+
+  .dark .ultra-thin-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, 
+      rgba(139, 92, 246, 0.7) 0%, 
+      rgba(79, 70, 229, 0.7) 50%,
+      rgba(59, 130, 246, 0.7) 100%);
+    border-color: rgba(0, 0, 0, 0.4);
+    box-shadow: 0 0 20px rgba(139, 92, 246, 0.5);
+    animation: none;
+  }
+
+  .dark .ultra-thin-scrollbar::-webkit-scrollbar-thumb:active {
+    background: linear-gradient(180deg, 
+      rgba(139, 92, 246, 0.9) 0%, 
+      rgba(79, 70, 229, 0.9) 50%,
+      rgba(59, 130, 246, 0.9) 100%);
+    box-shadow: 0 0 25px rgba(139, 92, 246, 0.7);
+  }
+
+  /* Invisible scrollbar that appears on hover with smooth animations */
+  .hover-scrollbar {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .hover-scrollbar::-webkit-scrollbar {
+    width: 0px;
+    background: transparent;
+    transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .hover-scrollbar:hover::-webkit-scrollbar,
+  .hover-scrollbar:focus-within::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  .hover-scrollbar::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.03);
+    border-radius: 12px;
+    margin: 4px;
+    transition: all 0.4s ease;
+    opacity: 0;
+  }
+
+  .hover-scrollbar:hover::-webkit-scrollbar-track,
+  .hover-scrollbar:focus-within::-webkit-scrollbar-track {
+    opacity: 1;
+  }
+
+  .hover-scrollbar::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, 
+      rgba(168, 85, 247, 0.5) 0%, 
+      rgba(236, 72, 153, 0.5) 50%, 
+      rgba(59, 130, 246, 0.5) 100%);
+    border-radius: 12px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+    box-shadow: 0 0 12px rgba(168, 85, 247, 0.3);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    animation: hover-glow 2s ease-in-out infinite;
+    opacity: 0;
+  }
+
+  .hover-scrollbar:hover::-webkit-scrollbar-thumb,
+  .hover-scrollbar:focus-within::-webkit-scrollbar-thumb {
+    opacity: 1;
+  }
+
+  @keyframes hover-glow {
+    0%, 100% {
+      box-shadow: 0 0 12px rgba(168, 85, 247, 0.3);
+    }
+    50% {
+      box-shadow: 0 0 18px rgba(168, 85, 247, 0.5);
+    }
+  }
+
+  .hover-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, 
+      rgba(168, 85, 247, 0.8) 0%, 
+      rgba(236, 72, 153, 0.8) 50%, 
+      rgba(59, 130, 246, 0.8) 100%);
+    transform: scale(1.1);
+    box-shadow: 0 0 20px rgba(168, 85, 247, 0.6);
+    animation: none;
+  }
+
+  /* Dark theme hover scrollbar with animations */
+  .dark .hover-scrollbar::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.03);
+  }
+
+  .dark .hover-scrollbar::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, 
+      rgba(139, 92, 246, 0.6) 0%, 
+      rgba(219, 39, 119, 0.6) 50%, 
+      rgba(79, 70, 229, 0.6) 100%);
+    box-shadow: 0 0 15px rgba(139, 92, 246, 0.4);
+    animation: dark-hover-glow 2s ease-in-out infinite;
+  }
+
+  @keyframes dark-hover-glow {
+    0%, 100% {
+      box-shadow: 0 0 15px rgba(139, 92, 246, 0.4);
+    }
+    50% {
+      box-shadow: 0 0 22px rgba(139, 92, 246, 0.6);
+    }
+  }
+
+  .dark .hover-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, 
+      rgba(139, 92, 246, 0.9) 0%, 
+      rgba(219, 39, 119, 0.9) 50%, 
+      rgba(79, 70, 229, 0.9) 100%);
+    box-shadow: 0 0 25px rgba(139, 92, 246, 0.7);
+    animation: none;
+  }
+
+  /* Glowing scrollbar for special areas with advanced animations */
+  .glow-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(139, 92, 246, 0.6) rgba(0, 0, 0, 0.05);
+    transition: scrollbar-color 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .glow-scrollbar::-webkit-scrollbar {
+    width: 12px;
+    height: 12px;
+  }
+
+  .glow-scrollbar::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 15px;
+    margin: 3px;
+    position: relative;
+    transition: all 0.6s ease;
+  }
+
+  .glow-scrollbar::-webkit-scrollbar-track::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(45deg, 
+      rgba(168, 85, 247, 0.1), 
+      rgba(236, 72, 153, 0.1), 
+      rgba(59, 130, 246, 0.1));
+    border-radius: 15px;
+    animation: track-pulse 4s ease-in-out infinite;
+  }
+
+  @keyframes track-pulse {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 0.6; }
+  }
+
+  .glow-scrollbar::-webkit-scrollbar-thumb {
+    background: linear-gradient(45deg, 
+      rgba(168, 85, 247, 0.7) 0%, 
+      rgba(236, 72, 153, 0.7) 33%, 
+      rgba(59, 130, 246, 0.7) 66%,
+      rgba(34, 197, 94, 0.7) 100%);
+    border-radius: 15px;
+    border: 3px solid transparent;
+    background-clip: padding-box;
+    box-shadow: 
+      0 0 20px rgba(168, 85, 247, 0.4),
+      inset 0 0 10px rgba(255, 255, 255, 0.2);
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    animation: spectrum-flow 6s linear infinite, thumb-breathe 3s ease-in-out infinite;
+    position: relative;
+  }
+
+  @keyframes spectrum-flow {
+    0% {
+      background: linear-gradient(45deg, 
+        rgba(168, 85, 247, 0.7) 0%, 
+        rgba(236, 72, 153, 0.7) 33%, 
+        rgba(59, 130, 246, 0.7) 66%,
+        rgba(34, 197, 94, 0.7) 100%);
+    }
+    25% {
+      background: linear-gradient(45deg, 
+        rgba(236, 72, 153, 0.7) 0%, 
+        rgba(59, 130, 246, 0.7) 33%, 
+        rgba(34, 197, 94, 0.7) 66%,
+        rgba(168, 85, 247, 0.7) 100%);
+    }
+    50% {
+      background: linear-gradient(45deg, 
+        rgba(59, 130, 246, 0.7) 0%, 
+        rgba(34, 197, 94, 0.7) 33%, 
+        rgba(168, 85, 247, 0.7) 66%,
+        rgba(236, 72, 153, 0.7) 100%);
+    }
+    75% {
+      background: linear-gradient(45deg, 
+        rgba(34, 197, 94, 0.7) 0%, 
+        rgba(168, 85, 247, 0.7) 33%, 
+        rgba(236, 72, 153, 0.7) 66%,
+        rgba(59, 130, 246, 0.7) 100%);
+    }
+    100% {
+      background: linear-gradient(45deg, 
+        rgba(168, 85, 247, 0.7) 0%, 
+        rgba(236, 72, 153, 0.7) 33%, 
+        rgba(59, 130, 246, 0.7) 66%,
+        rgba(34, 197, 94, 0.7) 100%);
+    }
+  }
+
+  @keyframes thumb-breathe {
+    0%, 100% {
+      transform: scale(1);
+      box-shadow: 
+        0 0 20px rgba(168, 85, 247, 0.4),
+        inset 0 0 10px rgba(255, 255, 255, 0.2);
+    }
+    50% {
+      transform: scale(1.05);
+      box-shadow: 
+        0 0 30px rgba(168, 85, 247, 0.6),
+        inset 0 0 15px rgba(255, 255, 255, 0.3);
+    }
+  }
+
+  .glow-scrollbar::-webkit-scrollbar-thumb:hover {
+    transform: scale(1.15);
+    box-shadow: 
+      0 0 40px rgba(168, 85, 247, 0.8),
+      inset 0 0 20px rgba(255, 255, 255, 0.4);
+    animation: none;
+    background: linear-gradient(45deg, 
+      rgba(168, 85, 247, 0.9) 0%, 
+      rgba(236, 72, 153, 0.9) 33%, 
+      rgba(59, 130, 246, 0.9) 66%,
+      rgba(34, 197, 94, 0.9) 100%);
+  }
+
+  .glow-scrollbar::-webkit-scrollbar-thumb:active {
+    transform: scale(1.2);
+    box-shadow: 
+      0 0 50px rgba(168, 85, 247, 1),
+      inset 0 0 25px rgba(255, 255, 255, 0.5);
+    background: linear-gradient(45deg, 
+      rgba(168, 85, 247, 1) 0%, 
+      rgba(236, 72, 153, 1) 33%, 
+      rgba(59, 130, 246, 1) 66%,
+      rgba(34, 197, 94, 1) 100%);
+  }
+
+  /* Dark theme glow scrollbar with enhanced spectrum animation */
+  .dark .glow-scrollbar {
+    scrollbar-color: rgba(139, 92, 246, 0.7) rgba(255, 255, 255, 0.03);
+    transition: scrollbar-color 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .dark .glow-scrollbar::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.03);
+  }
+
+  .dark .glow-scrollbar::-webkit-scrollbar-track::before {
+    background: linear-gradient(45deg, 
+      rgba(139, 92, 246, 0.15), 
+      rgba(219, 39, 119, 0.15), 
+      rgba(79, 70, 229, 0.15));
+    animation: dark-track-pulse 4s ease-in-out infinite;
+  }
+
+  @keyframes dark-track-pulse {
+    0%, 100% { opacity: 0.4; }
+    50% { opacity: 0.7; }
+  }
+
+  .dark .glow-scrollbar::-webkit-scrollbar-thumb {
+    background: linear-gradient(45deg, 
+      rgba(139, 92, 246, 0.8) 0%, 
+      rgba(219, 39, 119, 0.8) 33%, 
+      rgba(79, 70, 229, 0.8) 66%,
+      rgba(59, 130, 246, 0.8) 100%);
+    box-shadow: 
+      0 0 25px rgba(139, 92, 246, 0.5),
+      inset 0 0 12px rgba(0, 0, 0, 0.3);
+    animation: dark-spectrum-flow 6s linear infinite, dark-thumb-breathe 3s ease-in-out infinite;
+  }
+
+  @keyframes dark-spectrum-flow {
+    0% {
+      background: linear-gradient(45deg, 
+        rgba(139, 92, 246, 0.8) 0%, 
+        rgba(219, 39, 119, 0.8) 33%, 
+        rgba(79, 70, 229, 0.8) 66%,
+        rgba(59, 130, 246, 0.8) 100%);
+    }
+    25% {
+      background: linear-gradient(45deg, 
+        rgba(219, 39, 119, 0.8) 0%, 
+        rgba(79, 70, 229, 0.8) 33%, 
+        rgba(59, 130, 246, 0.8) 66%,
+        rgba(139, 92, 246, 0.8) 100%);
+    }
+    50% {
+      background: linear-gradient(45deg, 
+        rgba(79, 70, 229, 0.8) 0%, 
+        rgba(59, 130, 246, 0.8) 33%, 
+        rgba(139, 92, 246, 0.8) 66%,
+        rgba(219, 39, 119, 0.8) 100%);
+    }
+    75% {
+      background: linear-gradient(45deg, 
+        rgba(59, 130, 246, 0.8) 0%, 
+        rgba(139, 92, 246, 0.8) 33%, 
+        rgba(219, 39, 119, 0.8) 66%,
+        rgba(79, 70, 229, 0.8) 100%);
+    }
+    100% {
+      background: linear-gradient(45deg, 
+        rgba(139, 92, 246, 0.8) 0%, 
+        rgba(219, 39, 119, 0.8) 33%, 
+        rgba(79, 70, 229, 0.8) 66%,
+        rgba(59, 130, 246, 0.8) 100%);
+    }
+  }
+
+  @keyframes dark-thumb-breathe {
+    0%, 100% {
+      transform: scale(1);
+      box-shadow: 
+        0 0 25px rgba(139, 92, 246, 0.5),
+        inset 0 0 12px rgba(0, 0, 0, 0.3);
+    }
+    50% {
+      transform: scale(1.05);
+      box-shadow: 
+        0 0 35px rgba(139, 92, 246, 0.7),
+        inset 0 0 18px rgba(0, 0, 0, 0.4);
+    }
+  }
+
+  .dark .glow-scrollbar::-webkit-scrollbar-thumb:hover {
+    transform: scale(1.15);
+    box-shadow: 
+      0 0 45px rgba(139, 92, 246, 0.9),
+      inset 0 0 25px rgba(0, 0, 0, 0.5);
+    animation: none;
+    background: linear-gradient(45deg, 
+      rgba(139, 92, 246, 1) 0%, 
+      rgba(219, 39, 119, 1) 33%, 
+      rgba(79, 70, 229, 1) 66%,
+      rgba(59, 130, 246, 1) 100%);
+  }
+
+  .dark .glow-scrollbar::-webkit-scrollbar-thumb:active {
+    transform: scale(1.2);
+    box-shadow: 
+      0 0 55px rgba(139, 92, 246, 1),
+      inset 0 0 30px rgba(0, 0, 0, 0.6);
+    background: linear-gradient(45deg, 
+      rgba(139, 92, 246, 1) 0%, 
+      rgba(219, 39, 119, 1) 33%, 
+      rgba(79, 70, 229, 1) 66%,
+      rgba(59, 130, 246, 1) 100%);
+  }
+
+  /* Code block specific scrollbar with enhanced animations */
+  .code-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(139, 92, 246, 0.4) rgba(0, 0, 0, 0.05);
+    transition: scrollbar-color 0.5s ease;
+  }
+
+  .code-scrollbar::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  .code-scrollbar::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 8px;
+    margin: 2px;
+    transition: all 0.4s ease;
+  }
+
+  .code-scrollbar::-webkit-scrollbar-thumb {
+    background: linear-gradient(45deg, 
+      rgba(139, 92, 246, 0.5) 0%, 
+      rgba(59, 130, 246, 0.5) 50%,
+      rgba(34, 197, 94, 0.5) 100%);
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 10px rgba(139, 92, 246, 0.3);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    animation: code-shimmer 3s ease-in-out infinite;
+  }
+
+  @keyframes code-shimmer {
+    0% {
+      background: linear-gradient(45deg, 
+        rgba(139, 92, 246, 0.5) 0%, 
+        rgba(59, 130, 246, 0.5) 50%,
+        rgba(34, 197, 94, 0.5) 100%);
+    }
+    50% {
+      background: linear-gradient(45deg, 
+        rgba(59, 130, 246, 0.5) 0%, 
+        rgba(34, 197, 94, 0.5) 50%,
+        rgba(139, 92, 246, 0.5) 100%);
+    }
+    100% {
+      background: linear-gradient(45deg, 
+        rgba(139, 92, 246, 0.5) 0%, 
+        rgba(59, 130, 246, 0.5) 50%,
+        rgba(34, 197, 94, 0.5) 100%);
+    }
+  }
+
+  .code-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(45deg, 
+      rgba(139, 92, 246, 0.8) 0%, 
+      rgba(59, 130, 246, 0.8) 50%,
+      rgba(34, 197, 94, 0.8) 100%);
+    transform: scale(1.05);
+    box-shadow: 0 0 15px rgba(139, 92, 246, 0.5);
+    animation: none;
+  }
+
+  .code-scrollbar::-webkit-scrollbar-thumb:active {
+    background: linear-gradient(45deg, 
+      rgba(139, 92, 246, 1) 0%, 
+      rgba(59, 130, 246, 1) 50%,
+      rgba(34, 197, 94, 1) 100%);
+    box-shadow: 0 0 20px rgba(139, 92, 246, 0.7);
+  }
+
+  /* Dark theme code scrollbar with enhanced glow */
+  .dark .code-scrollbar {
+    scrollbar-color: rgba(139, 92, 246, 0.5) rgba(255, 255, 255, 0.03);
+    transition: scrollbar-color 0.5s ease;
+  }
+
+  .dark .code-scrollbar::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.03);
+  }
+
+  .dark .code-scrollbar::-webkit-scrollbar-thumb {
+    background: linear-gradient(45deg, 
+      rgba(139, 92, 246, 0.6) 0%, 
+      rgba(79, 70, 229, 0.6) 50%,
+      rgba(59, 130, 246, 0.6) 100%);
+    border-color: rgba(0, 0, 0, 0.2);
+    box-shadow: 0 0 12px rgba(139, 92, 246, 0.4);
+    animation: dark-code-shimmer 3s ease-in-out infinite;
+  }
+
+  @keyframes dark-code-shimmer {
+    0% {
+      background: linear-gradient(45deg, 
+        rgba(139, 92, 246, 0.6) 0%, 
+        rgba(79, 70, 229, 0.6) 50%,
+        rgba(59, 130, 246, 0.6) 100%);
+    }
+    50% {
+      background: linear-gradient(45deg, 
+        rgba(79, 70, 229, 0.6) 0%, 
+        rgba(59, 130, 246, 0.6) 50%,
+        rgba(139, 92, 246, 0.6) 100%);
+    }
+    100% {
+      background: linear-gradient(45deg, 
+        rgba(139, 92, 246, 0.6) 0%, 
+        rgba(79, 70, 229, 0.6) 50%,
+        rgba(59, 130, 246, 0.6) 100%);
+    }
+  }
+
+  .dark .code-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(45deg, 
+      rgba(139, 92, 246, 0.9) 0%, 
+      rgba(79, 70, 229, 0.9) 50%,
+      rgba(59, 130, 246, 0.9) 100%);
+    box-shadow: 0 0 20px rgba(139, 92, 246, 0.6);
+    animation: none;
+  }
+
+  .dark .code-scrollbar::-webkit-scrollbar-thumb:active {
+    background: linear-gradient(45deg, 
+      rgba(139, 92, 246, 1) 0%, 
+      rgba(79, 70, 229, 1) 50%,
+      rgba(59, 130, 246, 1) 100%);
+    box-shadow: 0 0 25px rgba(139, 92, 246, 0.8);
+  }
+
+  /* Rainbow Flowing Scrollbar - สำหรับพื้นที่พิเศษ */
+  .rainbow-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(168, 85, 247, 0.5) transparent;
+    transition: scrollbar-color 0.5s ease;
+  }
+
+  .rainbow-scrollbar::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  .rainbow-scrollbar::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.02);
+    border-radius: 12px;
+    margin: 3px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .rainbow-scrollbar::-webkit-scrollbar-track::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, 
+      rgba(255, 0, 0, 0.1) 0%,
+      rgba(255, 154, 0, 0.1) 16.66%,
+      rgba(255, 255, 0, 0.1) 33.33%,
+      rgba(0, 255, 0, 0.1) 50%,
+      rgba(0, 0, 255, 0.1) 66.66%,
+      rgba(130, 0, 255, 0.1) 83.33%,
+      rgba(255, 0, 255, 0.1) 100%);
+    border-radius: 12px;
+    animation: rainbow-track-flow 8s linear infinite;
+  }
+
+  @keyframes rainbow-track-flow {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+  }
+
+  .rainbow-scrollbar::-webkit-scrollbar-thumb {
+    background: linear-gradient(90deg, 
+      rgba(255, 0, 0, 0.6) 0%,
+      rgba(255, 154, 0, 0.6) 16.66%,
+      rgba(255, 255, 0, 0.6) 33.33%,
+      rgba(0, 255, 0, 0.6) 50%,
+      rgba(0, 0, 255, 0.6) 66.66%,
+      rgba(130, 0, 255, 0.6) 83.33%,
+      rgba(255, 0, 255, 0.6) 100%);
+    border-radius: 12px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 
+      0 0 15px rgba(168, 85, 247, 0.4),
+      inset 0 0 8px rgba(255, 255, 255, 0.2);
+    transition: all 0.4s ease;
+    animation: rainbow-flow 4s linear infinite, rainbow-glow 2s ease-in-out infinite;
+    background-size: 200% 100%;
+  }
+
+  @keyframes rainbow-flow {
+    0% { background-position: 0% 50%; }
+    100% { background-position: 200% 50%; }
+  }
+
+  @keyframes rainbow-glow {
+    0%, 100% {
+      box-shadow: 
+        0 0 15px rgba(168, 85, 247, 0.4),
+        inset 0 0 8px rgba(255, 255, 255, 0.2);
+    }
+    50% {
+      box-shadow: 
+        0 0 25px rgba(168, 85, 247, 0.6),
+        inset 0 0 12px rgba(255, 255, 255, 0.4);
+    }
+  }
+
+  .rainbow-scrollbar::-webkit-scrollbar-thumb:hover {
+    transform: scale(1.1);
+    box-shadow: 
+      0 0 30px rgba(168, 85, 247, 0.8),
+      inset 0 0 15px rgba(255, 255, 255, 0.5);
+    animation-duration: 2s, 1s;
+  }
+
+  .rainbow-scrollbar::-webkit-scrollbar-thumb:active {
+    transform: scale(1.15);
+    box-shadow: 
+      0 0 40px rgba(168, 85, 247, 1),
+      inset 0 0 20px rgba(255, 255, 255, 0.6);
+  }
+
+  /* Dark theme rainbow scrollbar */
+  .dark .rainbow-scrollbar {
+    scrollbar-color: rgba(139, 92, 246, 0.6) rgba(255, 255, 255, 0.02);
+  }
+
+  .dark .rainbow-scrollbar::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.02);
+  }
+
+  .dark .rainbow-scrollbar::-webkit-scrollbar-track::before {
+    background: linear-gradient(90deg, 
+      rgba(255, 0, 0, 0.15) 0%,
+      rgba(255, 154, 0, 0.15) 16.66%,
+      rgba(255, 255, 0, 0.15) 33.33%,
+      rgba(0, 255, 0, 0.15) 50%,
+      rgba(0, 0, 255, 0.15) 66.66%,
+      rgba(130, 0, 255, 0.15) 83.33%,
+      rgba(255, 0, 255, 0.15) 100%);
+  }
+
+  .dark .rainbow-scrollbar::-webkit-scrollbar-thumb {
+    background: linear-gradient(90deg, 
+      rgba(255, 0, 0, 0.7) 0%,
+      rgba(255, 154, 0, 0.7) 16.66%,
+      rgba(255, 255, 0, 0.7) 33.33%,
+      rgba(0, 255, 0, 0.7) 50%,
+      rgba(0, 0, 255, 0.7) 66.66%,
+      rgba(130, 0, 255, 0.7) 83.33%,
+      rgba(255, 0, 255, 0.7) 100%);
+    border-color: rgba(0, 0, 0, 0.3);
+    box-shadow: 
+      0 0 20px rgba(139, 92, 246, 0.5),
+      inset 0 0 10px rgba(0, 0, 0, 0.3);
+  }
+
+  .dark .rainbow-scrollbar::-webkit-scrollbar-thumb:hover {
+    box-shadow: 
+      0 0 35px rgba(139, 92, 246, 0.8),
+      inset 0 0 18px rgba(0, 0, 0, 0.4);
+  }
+
+  .dark .rainbow-scrollbar::-webkit-scrollbar-thumb:active {
+    box-shadow: 
+      0 0 45px rgba(139, 92, 246, 1),
+      inset 0 0 25px rgba(0, 0, 0, 0.5);
+  }
+
+  /* Beautiful Input Textarea Scrollbar */
+  .input-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(168, 85, 247, 0.4) rgba(0, 0, 0, 0.02);
+  }
+
+  .input-scrollbar::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  .input-scrollbar::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.02);
+    border-radius: 10px;
+    margin: 4px;
+  }
+
+  .input-scrollbar::-webkit-scrollbar-thumb {
+    background: linear-gradient(45deg, 
+      rgba(168, 85, 247, 0.6) 0%, 
+      rgba(236, 72, 153, 0.6) 100%);
+    border-radius: 10px;
+    box-shadow: 0 0 8px rgba(168, 85, 247, 0.3);
+    transition: all 0.3s ease;
+  }
+
+  .input-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(45deg, 
+      rgba(168, 85, 247, 0.8) 0%, 
+      rgba(236, 72, 153, 0.8) 100%);
+    box-shadow: 0 0 12px rgba(168, 85, 247, 0.5);
+    transform: scaleY(1.1);
+  }
+
+  .input-scrollbar::-webkit-scrollbar-thumb:active {
+    background: linear-gradient(45deg, 
+      rgba(168, 85, 247, 1) 0%, 
+      rgba(236, 72, 153, 1) 100%);
+    box-shadow: 0 0 16px rgba(168, 85, 247, 0.7);
+  }
+
+  /* Dark theme for input scrollbar */
+  .dark .input-scrollbar {
+    scrollbar-color: rgba(139, 92, 246, 0.5) rgba(255, 255, 255, 0.03);
+  }
+
+  .dark .input-scrollbar::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.03);
+  }
+
+  .dark .input-scrollbar::-webkit-scrollbar-thumb {
+    background: linear-gradient(45deg, 
+      rgba(139, 92, 246, 0.7) 0%, 
+      rgba(219, 39, 119, 0.7) 100%);
+    box-shadow: 0 0 10px rgba(139, 92, 246, 0.4);
+  }
+
+  .dark .input-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(45deg, 
+      rgba(139, 92, 246, 0.9) 0%, 
+      rgba(219, 39, 119, 0.9) 100%);
+    box-shadow: 0 0 15px rgba(139, 92, 246, 0.6);
+  }
+
+  .dark .input-scrollbar::-webkit-scrollbar-thumb:active {
+    background: linear-gradient(45deg, 
+      rgba(139, 92, 246, 1) 0%, 
+      rgba(219, 39, 119, 1) 100%);
+    box-shadow: 0 0 20px rgba(139, 92, 246, 0.8);
+  }
+}
