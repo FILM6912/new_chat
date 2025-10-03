@@ -4,6 +4,14 @@ export interface Message {
   sender: 'user' | 'agent';
   timestamp: Date;
   isTyping?: boolean;
+  images?: MessageImage[];
+}
+
+export interface MessageImage {
+  url: string;
+  file?: File;
+  name?: string;
+  size?: number;
 }
 
 export interface LangflowResponse {

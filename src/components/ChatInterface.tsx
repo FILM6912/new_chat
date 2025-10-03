@@ -7,7 +7,7 @@ import ThemeToggle from './ThemeToggle';
 import SettingsPanel from './SettingsPanel';
 import { useLangflow } from '@/hooks/useLangflow';
 import { useTheme } from '@/contexts/ThemeContext';
-import { Message } from '@/types/chat';
+import { Message, MessageImage } from '@/types/chat';
 import { Bot, Sparkles, Zap, Stars, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -49,13 +49,18 @@ export const ChatInterface = () => {
     scrollToBottom();
   }, [messages, isLoading]);
 
-  const handleSendMessage = async (content: string) => {
+  const handleSendMessage = async (content: string, images?: MessageImage[]) => {
+    console.log('handleSendMessage called with:', { content, images });
+    
     const userMessage: Message = {
       id: Date.now().toString(),
       content,
       sender: 'user',
       timestamp: new Date(),
+      images: images,
     };
+    
+    console.log('Created user message:', userMessage);
     setMessages(prev => [...prev, userMessage]);
 
     // Streaming agent message
@@ -68,8 +73,14 @@ export const ChatInterface = () => {
       timestamp: new Date(),
       streaming: true
     }]);
+    
     try {
-      await sendMessageStream(content, (partial) => {
+      // If there are images, include them in the message context
+      const messageWithImages = images && images.length > 0 
+        ? `${content}\n\n[ผู้ใช้ส่งรูปภาพ ${images.length} รูป]`
+        : content;
+        
+      await sendMessageStream(messageWithImages, (partial) => {
         streamedText = partial;
         setMessages(prev => prev.map(m =>
           m.id === agentId ? { ...m, content: streamedText, streaming: true } : m
