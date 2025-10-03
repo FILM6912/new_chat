@@ -1,25 +1,36 @@
 import { motion } from 'framer-motion';
 import { Message } from '@/types/chat';
-import { Bot, User, Copy, Check, Image as ImageIcon } from 'lucide-react';
+import { Bot, User, Copy, Check, Image as ImageIcon, X, ZoomIn } from 'lucide-react';
 import MarkdownRenderer from './MarkdownRenderer';
 import { useTheme } from '@/contexts/ThemeContext';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 interface MessageBubbleProps {
   message: Message & { streaming?: boolean };
   index: number;
+  onImageClick?: (image: { url: string; name?: string }) => void;
 }
 
-const MessageBubble = ({ message, index }: MessageBubbleProps) => {
+const MessageBubble = ({ message, index, onImageClick }: MessageBubbleProps) => {
   const isUser = message.sender === 'user';
   const { theme } = useTheme();
   const [copied, setCopied] = useState(false);
+
+  // Debug: ตรวจสอบว่ามี images หรือไม่
+  console.log('MessageBubble render:', {
+    messageId: message.id,
+    hasImages: !!message.images,
+    imageCount: message.images?.length || 0,
+    imageUrls: message.images?.map(img => img.url) || []
+  });
 
   const handleCopyAll = () => {
     navigator.clipboard.writeText(message.content);
     setCopied(true);
     setTimeout(() => setCopied(false), 1200);
   };
+
+
 
   return (
     <motion.div
@@ -87,7 +98,16 @@ const MessageBubble = ({ message, index }: MessageBubbleProps) => {
           className="relative z-10"
         >
           {/* Image Display */}
-          {message.images && message.images.length > 0 && (
+          {(() => {
+            console.log('Image check:', {
+              hasImages: !!message.images,
+              imageCount: message.images?.length || 0,
+              images: message.images
+            });
+            
+            if (message.images && message.images.length > 0) {
+              console.log('Rendering images for message:', message.id);
+              return (
             <motion.div
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -117,28 +137,33 @@ const MessageBubble = ({ message, index }: MessageBubbleProps) => {
                         console.log('Image loaded successfully:', image.url);
                       }}
                       onClick={() => {
-                        // Create a modal or open in new tab
-                        const newWindow = window.open();
-                        if (newWindow) {
-                          newWindow.document.write(`
-                            <html>
-                              <head><title>Image Preview</title></head>
-                              <body style="margin:0;padding:20px;background:#000;display:flex;justify-content:center;align-items:center;min-height:100vh;">
-                                <img src="${image.url}" style="max-width:100%;max-height:100%;object-fit:contain;" />
-                              </body>
-                            </html>
-                          `);
-                        }
+                        console.log('Image clicked in MessageBubble:', image.url);
+                        onImageClick?.({ url: image.url, name: image.name });
                       }}
                     />
                     {/* Image overlay with info */}
+                    {/* Zoom icon overlay */}
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      whileHover={{ opacity: 1 }}
+                      className="absolute inset-0 rounded-lg flex items-center justify-center bg-black/40 transition-opacity"
+                    >
+                      <motion.div
+                        whileHover={{ scale: 1.1 }}
+                        className="bg-white/20 backdrop-blur-sm rounded-full p-3"
+                      >
+                        <ZoomIn className="w-6 h-6 text-white" />
+                      </motion.div>
+                    </motion.div>
+
+                    {/* Image info overlay */}
                     <motion.div
                       initial={{ opacity: 0 }}
                       whileHover={{ opacity: 1 }}
                       className={`absolute inset-0 rounded-lg flex items-end transition-opacity ${
                         theme === 'dark'
-                          ? 'bg-black/50'
-                          : 'bg-black/30'
+                          ? 'bg-gradient-to-t from-black/60 to-transparent'
+                          : 'bg-gradient-to-t from-black/50 to-transparent'
                       }`}
                     >
                       <div className="p-2 text-white text-xs">
@@ -157,7 +182,10 @@ const MessageBubble = ({ message, index }: MessageBubbleProps) => {
                 ))}
               </div>
             </motion.div>
-          )}
+              );
+            }
+            return null;
+          })()}
 
           {/* Text Content */}
           {message.content && message.content.trim() !== '' && (
@@ -211,8 +239,125 @@ const MessageBubble = ({ message, index }: MessageBubbleProps) => {
           </div>
         </motion.div>
       </motion.div>
+
     </motion.div>
   );
 };
 
-export default MessageBubble;
+// Image Modal Component (outside of main component structure)
+const ImageModal = ({ 
+  selectedImage, 
+  onClose 
+}: { 
+  selectedImage: { url: string; name?: string } | null;
+  onClose: () => void;
+}) => {
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        onClose();
+      }
+    };
+
+    if (selectedImage) {
+      document.addEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = 'hidden';
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = 'unset';
+    };
+  }, [selectedImage, onClose]);
+
+  if (!selectedImage) {
+    console.log('ImageModal: No selectedImage');
+    return null;
+  }
+
+  console.log('ImageModal: Rendering modal for', selectedImage.url);
+
+  return (
+    <div
+      className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 backdrop-blur-sm"
+      onClick={onClose}
+      style={{ 
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        zIndex: 9999
+      }}
+    >
+      <div
+        className="relative max-w-[90vw] max-h-[90vh] bg-white rounded-2xl overflow-hidden shadow-2xl"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Close button */}
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 z-10 bg-black/50 hover:bg-black/70 text-white rounded-full p-2 transition-colors"
+        >
+          <X className="w-6 h-6" />
+        </button>
+
+        {/* Image */}
+        <img
+          src={selectedImage.url}
+          alt={selectedImage.name || 'Enlarged image'}
+          className="max-w-full max-h-full object-contain"
+          style={{ maxHeight: '90vh', maxWidth: '90vw' }}
+          onError={(e) => {
+            console.error('Modal image failed to load:', selectedImage.url);
+          }}
+        />
+
+        {/* Image info bar */}
+        {selectedImage.name && (
+          <div className="absolute bottom-0 left-0 right-0 bg-black/70 text-white p-4 backdrop-blur-sm">
+            <div className="flex items-center space-x-2">
+              <ImageIcon className="w-4 h-4" />
+              <span className="text-sm font-medium">{selectedImage.name}</span>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+// Main component with modal
+const MessageBubbleWithModal = ({ message, index }: Omit<MessageBubbleProps, 'onImageClick'>) => {
+  const [selectedImage, setSelectedImage] = useState<{ url: string; name?: string } | null>(null);
+
+  const handleImageClick = (image: { url: string; name?: string }) => {
+    console.log('Image clicked:', image);
+    setSelectedImage(image);
+  };
+
+  const handleCloseModal = () => {
+    console.log('Modal closed');
+    setSelectedImage(null);
+  };
+
+  return (
+    <>
+      <MessageBubble 
+        message={message} 
+        index={index} 
+        onImageClick={handleImageClick}
+      />
+      <ImageModal 
+        selectedImage={selectedImage} 
+        onClose={handleCloseModal} 
+      />
+    </>
+  );
+};
+
+
+
+
+
+export default MessageBubbleWithModal;

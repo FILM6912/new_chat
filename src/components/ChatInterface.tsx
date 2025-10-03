@@ -50,6 +50,8 @@ export const ChatInterface = () => {
   }, [messages, isLoading]);
 
   const handleSendMessage = async (content: string, images?: MessageImage[]) => {
+    console.log('handleSendMessage called with:', { content, images });
+    
     const userMessage: Message = {
       id: Date.now().toString(),
       content,
@@ -57,6 +59,8 @@ export const ChatInterface = () => {
       timestamp: new Date(),
       images: images,
     };
+    
+    console.log('Created user message:', userMessage);
     setMessages(prev => [...prev, userMessage]);
 
     // Streaming agent message
