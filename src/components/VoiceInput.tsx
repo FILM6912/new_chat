@@ -21,94 +21,80 @@ const VoiceInput = ({ onTranscript, onComplete, autoSend }: VoiceInputProps) => 
   const silenceCheckIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const isStoppingRef = useRef<boolean>(false);
 
-  useEffect(() => {
-    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-      const SpeechRecognition = window.webkitSpeechRecognition || window.SpeechRecognition;
-      recognitionRef.current = new SpeechRecognition();
-      
-      if (recognitionRef.current) {
-        recognitionRef.current.continuous = true;
-        recognitionRef.current.interimResults = true;
-        recognitionRef.current.lang = 'th-TH';
+  // Handlers and creator so we can recreate recognition if it was nulled
+  function handleResult(event: SpeechRecognitionEvent) {
+    // Skip processing if we're stopping
+    if (isStoppingRef.current) return;
 
-        recognitionRef.current.onresult = (event) => {
-          // Skip processing if we're stopping
-          if (isStoppingRef.current) {
-            return;
-          }
+    let transcript = '';
+    for (let i = 0; i < event.results.length; i++) {
+      transcript += event.results[i][0].transcript;
+    }
+    transcript = transcript.trim();
 
-          let finalTranscript = '';
-          let interimTranscript = '';
+    console.log('🔊 Direct speech transcript:', transcript);
+    setTranscript(transcript);
+    onTranscript(transcript);
 
-          for (let i = event.resultIndex; i < event.results.length; i++) {
-            const transcript = event.results[i][0].transcript;
-            if (event.results[i].isFinal) {
-              finalTranscript += transcript;
-            } else {
-              interimTranscript += transcript;
-            }
-          }
+    if (transcript.length > 0) {
+      lastSpeechTimeRef.current = Date.now();
+      lastFinalTranscriptRef.current = transcript;
+    }
 
-          const fullTranscript = (lastFinalTranscriptRef.current + finalTranscript + interimTranscript).trim();
-          setTranscript(fullTranscript);
-          onTranscript(fullTranscript);
-
-          // Update last speech time when we receive any speech input
-          if (finalTranscript.trim() || interimTranscript.trim()) {
-            const oldTime = lastSpeechTimeRef.current;
-            lastSpeechTimeRef.current = Date.now();
-            console.log(`🎤 Speech detected, updating lastSpeechTime: ${oldTime} -> ${lastSpeechTimeRef.current}`);
-          }
-
-          // Check if we have new final transcript
-          if (finalTranscript.trim()) {
-            lastFinalTranscriptRef.current += finalTranscript;
-            console.log(`Final transcript received: "${finalTranscript}", total: "${lastFinalTranscriptRef.current}"`);
-            
-            // ปิดไมค์ทันทีหลังจากได้รับ final transcript
-            console.log('🛑 Auto-stopping immediately after final transcript');
-            isStoppingRef.current = true;
-            stopListening();
-            return;
-
-            // Clear any existing timeout
-            if (timeoutRef.current) {
-              clearTimeout(timeoutRef.current);
-            }
-
-            // Only set a very long backup timeout - let silence detection handle the main logic
-            timeoutRef.current = setTimeout(() => {
-              if (isListening && lastFinalTranscriptRef.current.trim()) {
-                console.log('Backup timeout triggered, stopping...');
-                stopListening();
-              }
-            }, 10000); // 10 second backup timeout (should never be reached)
-          }
-        };
-
-        recognitionRef.current.onend = () => {
-          if (isListening && !isStoppingRef.current) {
-            // Restart if still supposed to be listening and not in stopping process
-            try {
-              recognitionRef.current?.start();
-            } catch (error) {
-              console.log('Failed to restart recognition:', error);
-            }
-          }
-        };
-
-        recognitionRef.current.onerror = (event) => {
-          // Completely ignore aborted errors - they're normal when stopping
-          if (event.error === 'aborted') {
-            return;
-          }
-          
-          console.error('Speech recognition error:', event.error);
-          setIsListening(false);
-          isStoppingRef.current = false;
-        };
+    for (let i = 0; i < event.results.length; i++) {
+      if (event.results[i].isFinal) {
+        const finalResult = event.results[i][0].transcript.trim();
+        if (finalResult) {
+          console.log('✅ Final result detected, stopping microphone immediately:', finalResult);
+          // Stop recognition immediately
+          isStoppingRef.current = true;
+          try { recognitionRef.current?.stop(); } catch (e) { console.log('Error stopping recognition in onresult:', e); }
+          stopListening();
+          return;
+        }
       }
     }
+  }
+
+  function handleEnd() {
+    console.log('🏁 Recognition ended, isStoppingRef:', isStoppingRef.current);
+    if (!isStoppingRef.current) {
+      console.log('🛑 Recognition ended naturally, stopping listening');
+      stopListening();
+    }
+  }
+
+  function handleError(event: SpeechRecognitionErrorEvent) {
+    console.error('Speech recognition error:', event.error);
+    if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
+      setIsListening(false);
+      isStoppingRef.current = false;
+      return;
+    }
+    if (event.error === 'aborted') return;
+    if (event.error === 'no-speech' || event.error === 'audio-capture') {
+      console.log('⚠️ Speech recognition error, will restart on onend:', event.error);
+      return;
+    }
+    setIsListening(false);
+    isStoppingRef.current = false;
+  }
+
+  const createRecognition = () => {
+    if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) return;
+    const SpeechRecognition = (window as any).webkitSpeechRecognition || (window as any).SpeechRecognition;
+    recognitionRef.current = new SpeechRecognition();
+    recognitionRef.current.continuous = true;
+    recognitionRef.current.interimResults = true;
+    recognitionRef.current.lang = 'th-TH';
+    recognitionRef.current.onresult = handleResult;
+    recognitionRef.current.onend = handleEnd;
+    recognitionRef.current.onerror = handleError as any;
+  };
+
+  useEffect(() => {
+    // Initialize recognition on component mount
+    createRecognition();
 
     return () => {
       if (timeoutRef.current) {
@@ -117,10 +103,28 @@ const VoiceInput = ({ onTranscript, onComplete, autoSend }: VoiceInputProps) => 
       if (silenceCheckIntervalRef.current) {
         clearInterval(silenceCheckIntervalRef.current);
       }
+      // Ensure recognition is fully stopped on unmount
+      if (recognitionRef.current) {
+        try {
+          try { recognitionRef.current.onresult = null; } catch {}
+          try { recognitionRef.current.onend = null; } catch {}
+          try { recognitionRef.current.onerror = null; } catch {}
+          recognitionRef.current.stop();
+          try { (recognitionRef.current as any).abort?.(); } catch {}
+        } catch (e) {
+          console.warn('Error during recognition cleanup:', e);
+        }
+        recognitionRef.current = null;
+      }
     };
-  }, [isListening, onTranscript]);
+  }, []);
 
   const startListening = () => {
+    // If recognition instance was nulled (after a stop), recreate it
+    if (!recognitionRef.current) {
+      createRecognition();
+    }
+
     if (recognitionRef.current) {
       console.log(`Starting voice input with autoSend: ${autoSend}`);
       setIsListening(true);
@@ -128,7 +132,12 @@ const VoiceInput = ({ onTranscript, onComplete, autoSend }: VoiceInputProps) => 
       lastFinalTranscriptRef.current = '';
       lastSpeechTimeRef.current = Date.now();
       isStoppingRef.current = false;
-      recognitionRef.current.start();
+      try {
+        recognitionRef.current.start();
+      } catch (err) {
+        console.log('Error starting recognition:', err);
+        return;
+      }
 
       // Start silence detection interval
       silenceCheckIntervalRef.current = setInterval(() => {
@@ -157,11 +166,11 @@ const VoiceInput = ({ onTranscript, onComplete, autoSend }: VoiceInputProps) => 
   };
 
   const stopListening = () => {
-    console.log('stopListening called');
-    
+    console.log('🛑 stopListening called (force stop)');
+
     // Set stopping flag to prevent restart and new processing
     isStoppingRef.current = true;
-    
+
     // Clear all timeouts and intervals first
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
@@ -172,27 +181,46 @@ const VoiceInput = ({ onTranscript, onComplete, autoSend }: VoiceInputProps) => 
       silenceCheckIntervalRef.current = null;
     }
 
+    // Stop recognition immediately and detach handlers to ensure mic is released
+    if (recognitionRef.current) {
+      try {
+        // remove handlers to avoid re-entrancy / restarts
+        try { recognitionRef.current.onresult = null; } catch {}
+        try { recognitionRef.current.onend = null; } catch {}
+        try { recognitionRef.current.onerror = null; } catch {}
+
+        recognitionRef.current.stop();
+        // Some implementations also provide abort()
+        try { (recognitionRef.current as any).abort?.(); } catch {}
+        console.log('🔇 Recognition stopped successfully (handlers detached, abort attempted)');
+      } catch (error) {
+        console.log('Error stopping recognition:', error);
+      }
+
+      // null out the instance so useEffect can recreate it on next start
+      try {
+        recognitionRef.current = null;
+      } catch {}
+    }
+
     const finalText = (lastFinalTranscriptRef.current || transcript).trim();
-    console.log(`Stopping with text: "${finalText}"`);
-    
+    console.log(`🏁 Stopping with text: "${finalText}"`);
+
+    // Update UI state
     setIsListening(false);
-    
+
+    // Send the complete text
     if (finalText) {
       onComplete(finalText);
     }
-    
+
+    // Clear text states
     setTranscript('');
     lastFinalTranscriptRef.current = '';
 
-    // Stop recognition after a short delay to allow current processing to finish
+    // Keep isStoppingRef true briefly; startListening will reset it
     setTimeout(() => {
-      if (recognitionRef.current) {
-        try {
-          recognitionRef.current.stop();
-        } catch (error) {
-          console.log('Error stopping recognition:', error);
-        }
-      }
+      // leave it false if component still mounted; startListening sets it to false anyway
       isStoppingRef.current = false;
     }, 100);
   };
